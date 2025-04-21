@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser"; 
 
 import authRoutes from "./routes/auth.route.js"; // Importing the auth routes
+import messageRoutes from "./routes/messageRoutes.js"; // Importing the auth routes
 import { connectDB } from "./lib/db.js";
 
 dotenv.config();
@@ -14,11 +15,8 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/api/auth", authRoutes);
+app.use("/api/message", messageRoutes);
 
-app.get("/" , (req,res) => {
-    res.send("hello world!!");
-    
-})
 app.listen(PORT,()=> {
     console.log(`Server is running on port ${PORT}`);
     console.log(`http://localhost:${PORT}`);
