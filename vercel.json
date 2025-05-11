@@ -6,7 +6,7 @@
       },
       {
         "source": "/frontend/(.*)",
-        "destination": "/frontend/index.html"
+        "destination": "/index.html"
       }
     ],
     "regions": ["bom1"]
