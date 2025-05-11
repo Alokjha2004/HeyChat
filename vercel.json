@@ -1,0 +1,13 @@
+{
+    "rewrites": [
+      {
+        "source": "/api/(.*)",
+        "destination": "/api"
+      },
+      {
+        "source": "/frontend/(.*)",
+        "destination": "/frontend/index.html"
+      }
+    ],
+    "regions": ["bom1"]
+  }
