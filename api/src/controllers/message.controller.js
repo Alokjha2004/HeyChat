@@ -41,6 +41,16 @@ export const sendMessage = async (req, res) => {
     const { id: receiverId } = req.params;
     const senderId = req.user._id;
 
+    // Validate that at least text or image is provided
+    if (!text && !image) {
+      return res.status(400).json({ error: "Message must contain either text or image" });
+    }
+
+    // Validate receiverId format
+    if (!receiverId.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({ error: "Invalid receiver ID format" });
+    }
+
     let imageUrl;
     if (image) {
       // Upload base64 image to cloudinary

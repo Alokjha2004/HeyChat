@@ -13,6 +13,15 @@ import { app, server } from "./src/lib/socket.js";
 
 dotenv.config();
 
+// Validate required environment variables
+const requiredEnvVars = ['JWT_SECRET', 'MONGODB_URI', 'PORT'];
+const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName]);
+
+if (missingEnvVars.length > 0) {
+  console.error(`Missing required environment variables: ${missingEnvVars.join(', ')}`);
+  process.exit(1);
+}
+
 const PORT = process.env.PORT;
 const __dirname = path.resolve();
 
