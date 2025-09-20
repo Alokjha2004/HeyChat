@@ -7,7 +7,14 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: [process.env.FRONTEND_URL],
+    origin: [
+      process.env.FRONTEND_URL,
+      "http://localhost:5173",
+      "http://localhost:3000", 
+      "https://hey-chat-nu.vercel.app",
+      "https://heychat-frontend.vercel.app"
+    ],
+    credentials: true,
   },
 });
 

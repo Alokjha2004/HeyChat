@@ -5,11 +5,11 @@ export const protectRoute = async (req, res, next) => {
   try {
     const token = req.cookies.jwt;
     
-    // Debug logging for development
-    if (process.env.NODE_ENV !== "production") {
-      console.log("Auth Debug - Cookies received:", req.cookies);
-      console.log("Auth Debug - JWT token:", token ? "Present" : "Missing");
-    }
+    // Debug logging for troubleshooting
+    console.log("Auth Debug - Request origin:", req.get('origin'));
+    console.log("Auth Debug - Request headers:", req.headers);
+    console.log("Auth Debug - Cookies received:", req.cookies);
+    console.log("Auth Debug - JWT token:", token ? "Present" : "Missing");
 
     if (!token) {
       return res.status(401).json({ message: "Unauthorized - No Token Provided" });
