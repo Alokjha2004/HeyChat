@@ -3,12 +3,21 @@ import User from "../models/user.model.js";
 
 export const protectRoute = async (req, res, next) => {
   try {
-    const token = req.cookies.jwt;
+    // Try to get token from cookies first, then from Authorization header
+    let token = req.cookies.jwt;
+    
+    // If no cookie token, try Authorization header
+    if (!token) {
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        token = authHeader.substring(7); // Remove 'Bearer ' prefix
+      }
+    }
     
     // Debug logging for troubleshooting
     console.log("Auth Debug - Request origin:", req.get('origin'));
-    console.log("Auth Debug - Request headers:", req.headers);
-    console.log("Auth Debug - Cookies received:", req.cookies);
+    console.log("Auth Debug - Cookies received:", Object.keys(req.cookies).length > 0 ? "Present" : "None");
+    console.log("Auth Debug - Auth header:", req.headers.authorization ? "Present" : "None");
     console.log("Auth Debug - JWT token:", token ? "Present" : "Missing");
 
     if (!token) {
