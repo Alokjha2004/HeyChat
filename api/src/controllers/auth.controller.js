@@ -4,9 +4,9 @@ import bcrypt from "bcryptjs";
 import cloudinary from "../lib/cloudinary.js";
 
 export const signup = async (req, res) => {
-  const { fullName, email, password } = req.body;
+  const { fullName, email, password, bio } = req.body;
   try {
-    if (!fullName || !email || !password) {
+    if (!fullName || !email || !password || !bio) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -14,7 +14,7 @@ export const signup = async (req, res) => {
       return res.status(400).json({ message: "Password must be at least 6 characters" });
     }
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }); 
 
     if (user) return res.status(400).json({ message: "Email already exists" });
 
@@ -25,10 +25,10 @@ export const signup = async (req, res) => {
       fullName,
       email,
       password: hashedPassword,
+      bio: bio || "",
     });
 
     if (newUser) {
-      // generate jwt token here
       const token = generateToken(newUser._id, res);
       await newUser.save();
 
@@ -37,7 +37,8 @@ export const signup = async (req, res) => {
         fullName: newUser.fullName,
         email: newUser.email,
         profilePic: newUser.profilePic,
-        token: token, // Include token in response for localStorage fallback
+        bio: newUser.bio,
+        token: token,
       });
     } else {
       res.status(400).json({ message: "Invalid user data" });
@@ -49,8 +50,8 @@ export const signup = async (req, res) => {
 };
 
 export const login = async (req, res) => {
-  const { email, password } = req.body;
   try {
+    const { email, password } = req.body;
     const user = await User.findOne({ email });
 
     if (!user) {
@@ -69,7 +70,8 @@ export const login = async (req, res) => {
       fullName: user.fullName,
       email: user.email,
       profilePic: user.profilePic,
-      token: token, // Include token in response for localStorage fallback
+      bio: user.bio,
+      token: token,
     });
   } catch (error) {
     console.log("Error in login controller", error.message);
@@ -87,26 +89,52 @@ export const logout = (req, res) => {
   }
 };
 
+export const getLastSeen = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId).select("fullName lastSeen");
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+    res.status(200).json({ success: true, lastSeen: user.lastSeen });
+  } catch (error) {
+    console.error("Error in getLastSeen:", error.message);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
 export const updateProfile = async (req, res) => {
   try {
-    const { profilePic } = req.body;
+    const { profilePic, fullName, bio } = req.body;
     const userId = req.user._id;
 
-    if (!profilePic) {
-      return res.status(400).json({ message: "Profile pic is required" });
+    const updateData = {};
+    
+    if (profilePic) {
+      try {
+        const uploadResponse = await cloudinary.uploader.upload(profilePic);
+        updateData.profilePic = uploadResponse.secure_url;
+      } catch (cloudinaryError) {
+        console.error("Cloudinary upload error:", cloudinaryError);
+        return res.status(500).json({ 
+          success: false, 
+          message: "Failed to upload profile picture" 
+        });
+      }
     }
+    
+    if (fullName) updateData.fullName = fullName;
+    if (bio) updateData.bio = bio;
 
-    const uploadResponse = await cloudinary.uploader.upload(profilePic);
     const updatedUser = await User.findByIdAndUpdate(
       userId,
-      { profilePic: uploadResponse.secure_url },
+      updateData,
       { new: true }
-    );
+    ).select("-password");
 
     res.status(200).json(updatedUser);
   } catch (error) {
-    console.log("error in update profile:", error);
-    res.status(500).json({ message: "Internal server error" });
+    console.error("Error in update profile:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 

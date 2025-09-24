@@ -5,28 +5,25 @@ import express from "express";
 const app = express();
 const server = http.createServer(app);
 
-const io = new Server(server, {
-  cors: {
-    origin: [
-      process.env.FRONTEND_URL,
-      "http://localhost:5173",
-      "http://localhost:3000", 
-      "https://hey-chat-nu.vercel.app",
-      "https://heychat-frontend.vercel.app"
-    ],
-    credentials: true,
-  },
-});
-
+// const io = new Server(server, {
+//   cors: {
+//     origin: process.env.FRONTEND_URL || "http://localhost:5173",
+//     credentials: true,
+//   },
+//   pingTimeout: 60000, // Increase timeout for better stability
+// });
+const io=  new Server(server, {
+     cors:{origin: "*"}
+})
 export function getReceiverSocketId(userId) {
   return userSocketMap[userId];
 }
 
-// used to store online users
+// Store online users
 const userSocketMap = {}; // {userId: socketId}
 
 io.on("connection", (socket) => {
-  console.log("A user connected", socket.id);
+  console.log("User connected:", socket.id);
 
   const userId = socket.handshake.query.userId;
   if (userId) userSocketMap[userId] = socket.id;
@@ -34,10 +31,38 @@ io.on("connection", (socket) => {
   // io.emit() is used to send events to all the connected clients
   io.emit("getOnlineUsers", Object.keys(userSocketMap));
 
+  // Handle typing events
+  socket.on("typing", (data) => {
+    if (data && data.toUserId) {
+      const receiverSocketId = getReceiverSocketId(data.toUserId);
+      if (receiverSocketId) {
+        io.to(receiverSocketId).emit("typing", userId);
+      }
+    }
+  });
+
+  // Handle last seen updates
+  socket.on("updateLastSeen", (userId) => {
+    if (userId) {
+      io.emit("lastSeenUpdate", {
+        userId,
+        lastSeen: new Date(),
+      });
+    }
+  });
+
   socket.on("disconnect", () => {
-    console.log("A user disconnected", socket.id);
-    delete userSocketMap[userId];
-    io.emit("getOnlineUsers", Object.keys(userSocketMap));
+    console.log("User disconnected:", socket.id);
+
+    // Find and remove the userId from userSocketMap
+    const userIdToRemove = Object.keys(userSocketMap).find(
+      (key) => userSocketMap[key] === socket.id
+    );
+
+    if (userIdToRemove) {
+      delete userSocketMap[userIdToRemove];
+      io.emit("getOnlineUsers", Object.keys(userSocketMap));
+    }
   });
 });
 

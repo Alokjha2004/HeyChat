@@ -20,6 +20,13 @@ const userSchema = new mongoose.Schema(
             type: String,
             default: "",
         },
+        bio : {
+            type: String
+        },
+        lastSeen: { 
+            type: Date, 
+            default: null, 
+        },
     },
     {timestamps: true}
 );
