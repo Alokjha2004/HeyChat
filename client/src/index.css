@@ -10,6 +10,11 @@
   display:none;
 }
 
+/* Set CSS custom property for mobile viewport */
+:root {
+  --vh: 1vh;
+}
+
 /* Premium animated background */
 body {
   background: 
@@ -20,6 +25,7 @@ body {
   background-size: 400% 400%;
   animation: gradientShift 15s ease infinite;
   min-height: 100vh;
+  min-height: calc(var(--vh, 1vh) * 100);
 }
 
 @keyframes gradientShift {
@@ -38,6 +44,48 @@ body {
     0 25px 45px rgba(0, 0, 0, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.2),
     inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* Mobile viewport fixes */
+@media (max-width: 768px) {
+  /* Fix for mobile chat container */
+  .mobile-chat-container {
+    height: 100vh;
+    height: calc(var(--vh, 1vh) * 100);
+    max-height: 100vh;
+    max-height: calc(var(--vh, 1vh) * 100);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+  }
+
+  /* Prevent body scroll when chat is active on mobile */
+  body.mobile-chat-active {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Mobile keyboard handling */
+  .mobile-chat-input {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+  }
+
+  /* Ensure proper mobile viewport on iOS */
+  @supports (-webkit-touch-callout: none) {
+    .mobile-chat-container {
+      height: -webkit-fill-available;
+      min-height: -webkit-fill-available;
+    }
+  }
 }
 
 /* Floating particles animation */
