@@ -53,14 +53,27 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="min-h-screen floating-particles flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Premium background decorations */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-32 left-20 w-80 h-80 bg-indigo-500/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-32 right-20 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 opacity-20">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `radial-gradient(circle at 25% 25%, rgba(16, 185, 129, 0.3) 0%, transparent 50%),
+                           radial-gradient(circle at 75% 25%, rgba(20, 184, 166, 0.25) 0%, transparent 50%),
+                           radial-gradient(circle at 25% 75%, rgba(6, 182, 212, 0.2) 0%, transparent 50%),
+                           radial-gradient(circle at 75% 75%, rgba(34, 197, 94, 0.15) 0%, transparent 50%)`,
+          backgroundSize: '400px 400px, 350px 350px, 300px 300px, 250px 250px'
+        }}></div>
       </div>
 
-      <div className="w-full max-w-md glass-morphism rounded-3xl overflow-hidden shadow-2xl relative z-10 shimmer">
+      {/* Floating Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/5 left-1/5 w-40 h-40 bg-emerald-500/8 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/4 right-1/5 w-32 h-32 bg-teal-500/6 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-cyan-500/4 rounded-full blur-3xl animate-pulse" style={{animationDelay: '4s'}}></div>
+        <div className="absolute top-3/4 left-1/4 w-28 h-28 bg-green-500/5 rounded-full blur-2xl animate-pulse" style={{animationDelay: '6s'}}></div>
+      </div>
+
+      <div className="w-full max-w-md bg-slate-800/40 backdrop-blur-xl border border-slate-700/50 rounded-3xl overflow-hidden shadow-2xl relative z-10">
         {/* Back Button */}
         <button
           type="button"
